@@ -50,18 +50,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Загрузка всех блюд из Supabase
 async function loadFromSupabase() {
     try {
-        const response = await fetch(`${API_URL}?order=id.asc`, {
+        console.log('🔄 Загрузка из Supabase...');
+        console.log('URL:', API_URL);
+        console.log('Ключ (первые 20 символов):', SUPABASE_ANON_KEY.substring(0, 20) + '...');
+        
+        const response = await fetch(`${API_URL}?select=*`, {
             headers: HEADERS
         });
-        
+
+        console.log('Ответ сервера - статус:', response.status, response.statusText);
+
         if (!response.ok) {
-            throw new Error(`HTTP ошибка: ${response.status}`);
+            const errorText = await response.text();
+            console.error('❌ Ошибка Supabase:', response.status, errorText);
+            alert(`⚠️ Ошибка подключения к базе данных.\n\nСтатус: ${response.status}\nОтвет: ${errorText}\n\nПроверь настройки Supabase.`);
+            return;
         }
-        
+
         dishes = await response.json();
+        console.log(`✅ Загружено рецептов: ${dishes.length}`);
+        if (dishes.length > 0) {
+            console.log('Первые 3 рецепта:', dishes.slice(0, 3));
+        }
     } catch (error) {
-        console.error('Ошибка загрузки из Supabase:', error);
-        alert('⚠️ Ошибка подключения к базе данных. Проверь настройки Supabase.');
+        console.error('❌ Ошибка загрузки из Supabase:', error);
+        alert('⚠️ Ошибка подключения к базе данных. Проверь настройки Supabase.\n\nОшибка: ' + error.message);
     }
 }
 
