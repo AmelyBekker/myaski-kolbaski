@@ -31,7 +31,9 @@ let currentAddImage = null;
 let dishes = [];
 
 // Инициализация при загрузке
+console.log('🟢 script.js загружен!');
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🟡 DOMContentLoaded сработал!');
     if (SUPABASE_URL.includes('ВСТАВЬ')) {
         alert('⚠️ Supabase не настроен!\n\nОткрой файл supabase-config.js и вставь свои URL и ключ.\nСмотри инструкку в INSTRUCTION.md');
         return;
@@ -68,6 +70,18 @@ async function loadFromSupabase() {
         }
 
         dishes = await response.json();
+        
+        // Преобразуем snake_case → camelCase
+        dishes = dishes.map(dish => ({
+            id: dish.id,
+            categoryId: dish.category_id,
+            name: dish.name,
+            recipe: dish.recipe,
+            image: dish.image,
+            hidden: dish.hidden,
+            inToday: dish.in_today
+        }));
+        
         console.log(`✅ Загружено рецептов: ${dishes.length}`);
         if (dishes.length > 0) {
             console.log('Первые 3 рецепта:', dishes.slice(0, 3));
