@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Миграция данных в Supabase 💜</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #5b21b6, #7c3aed, #9f67ff);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(26, 26, 26, 0.95);
+            border: 2px solid #61025e;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #9f67ff;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .status {
+            background: rgba(97, 2, 94, 0.3);
+            border: 1px solid #61025e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(97, 2, 94, 0.3);
+            font-size: 0.95rem;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-icon {
+            font-size: 1.3rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .status-label {
+            color: #9ca3af;
+            min-width: 180px;
+        }
+
+        .status-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .status-value.loading {
+            color: #9f67ff;
+        }
+
+        .status-value.success {
+            color: #22c55e;
+        }
+
+        .status-value.error {
+            color: #ef4444;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(97, 2, 94, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #61025e);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #7c3aed, #61025e);
+            border: none;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(124, 58, 237, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #61025e;
+            margin-top: 10px;
+        }
+
+        .log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-line {
+            padding: 3px 0;
+            color: #9ca3af;
+        }
+
+        .log-line.success { color: #22c55e; }
+        .log-line.error { color: #ef4444; }
+        .log-line.info { color: #9f67ff; }
+
+        .import-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(97, 2, 94, 0.3);
+        }
+
+        .import-section label {
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #9ca3af;
+        }
+
+        .hidden { display: none; }
+
+        .success-message {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-message .emoji {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .success-message h2 {
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Миграция данных в Supabase</h1>
+        <p class="subtitle">Перенесёт все рецепты из браузера в облачную базу данных</p>
+
+        <div id="step1">
+            <div class="status">
+                <div class="status-item">
+                    <span class="status-icon">🔍</span>
+                    <span class="status-label">IndexedDB (локальное хранилище):</span>
+                    <span class="status-value loading" id="indexedDbCount">Проверяю...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">📁</span>
+                    <span class="status-label">Файл импорта (.json):</span>
+                    <span class="status-value" id="fileCount">—</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">☁️</span>
+                    <span class="status-label">Supabase:</span>
+                    <span class="status-value loading" id="supabaseStatus">Ожидание...</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <button class="btn" id="startMigration">🚀 Начать миграцию из IndexedDB</button>
+
+            <div class="import-section">
+                <label>Или загрузи файл экспорта (.json):</label>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+                <button class="btn btn-secondary" id="chooseFile">📂 Выбрать файл экспорта</button>
+            </div>
+
+            <div class="log hidden" id="log"></div>
+        </div>
+
+        <div id="step2" class="success-message hidden">
+            <div class="emoji">🎉</div>
+            <h2>Миграция завершена!</h2>
+            <p id="migrateResult"></p>
+            <a href="index.html" class="btn" style="text-decoration: none; display: inline-block; width: auto; padding: 15px 40px;">
+                Открыть сайт →
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // КОНФИГУРАЦИЯ SUPABASE
+        // =============================================
+        const SUPABASE_URL = 'https://htuzloqefvljfjlapacc.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_wi33_gPix08GxEfnRBtUtg_yvTGx4Ye';
+
+        const API_URL = `${SUPABASE_URL}/rest/v1/dishes`;
+        const HEADERS = {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+        };
+
+        let dishesFromIndexedDB = [];
+        let dishesFromFile = [];
+        let logEl;
+
+        // Логирование
+        function log(message, type = '') {
+            if (!logEl) {
+                logEl = document.getElementById('log');
+                logEl.classList.remove('hidden');
+            }
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            line.textContent = `> ${message}`;
+            logEl.appendChild(line);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Прогресс
+        function setProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        // Проверка IndexedDB
+        async function checkIndexedDB() {
+            return new Promise((resolve) => {
+                const request = indexedDB.open('HomeMenuDB', 1);
+                
+                request.onupgradeneeded = () => {
+                    // БД ещё не существует
+                    dishesFromIndexedDB = [];
+                    document.getElementById('indexedDbCount').textContent = '0 рецептов';
+                    document.getElementById('indexedDbCount').className = 'status-value';
+                    resolve(0);
+                };
+                
+                request.onsuccess = (e) => {
+                    const db = e.target.result;
+                    const tx = db.transaction('dishes', 'readonly');
+                    const store = tx.objectStore('dishes');
+                    const getAll = store.getAll();
+                    
+                    getAll.onsuccess = () => {
+                        dishesFromIndexedDB = getAll.result || [];
+                        const count = dishesFromIndexedDB.length;
+                        const el = document.getElementById('indexedDbCount');
+                        el.textContent = `${count} рецептов`;
+                        el.className = count > 0 ? 'status-value success' : 'status-value';
+                        resolve(count);
+                    };
+                    
+                    getAll.onerror = () => {
+                        dishesFromIndexedDB = [];
+                        document.getElementById('indexedDbCount').textContent = 'Ошибка чтения';
+                        document.getElementById('indexedDbCount').className = 'status-value error';
+                        resolve(0);
+                    };
+                };
+                
+                request.onerror = () => {
+                    dishesFromIndexedDB = [];
+                    document.getElementById('indexedDbCount').textContent = 'Недоступно';
+                    document.getElementById('indexedDbCount').className = 'status-value error';
+                    resolve(0);
+                };
+            });
+        }
+
+        // Импорт из файла
+        async function importFromFile(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        dishesFromFile = JSON.parse(e.target.result);
+                        if (!Array.isArray(dishesFromFile)) {
+                            dishesFromFile = [];
+                        }
+                        const count = dishesFromFile.length;
+                        const el = document.getElementById('fileCount');
+                        el.textContent = `${count} рецептов (${file.name})`;
+                        el.className = count > 0 ? 'status-value success' : 'status-value';
+                        resolve(count);
+                    } catch {
+                        document.getElementById('fileCount').textContent = 'Ошибка файла';
+                        document.getElementById('fileCount').className = 'status-value error';
+                        resolve(0);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // Миграция в Supabase
+        async function migrateToSupabase(sourceDishes) {
+            const el = document.getElementById('supabaseStatus');
+            el.textContent = 'Подключаюсь...';
+            el.className = 'status-value loading';
+
+            try {
+                // Проверка подключения
+                const testResponse = await fetch(API_URL, { headers: HEADERS });
+                if (!testResponse.ok) {
+                    throw new Error(`HTTP ${testResponse.status}`);
+                }
+
+                // Получаем существующие блюда
+                const existingResponse = await fetch(API_URL, { headers: HEADERS });
+                const existingDishes = await existingResponse.json();
+                log(`Найдено ${existingDishes.length} существующих блюд в Supabase`, 'info');
+
+                // Добавляем каждое блюдо
+                const total = sourceDishes.length;
+                let added = 0;
+                let updated = 0;
+                let errors = 0;
+
+                for (let i = 0; i < total; i++) {
+                    const dish = sourceDishes[i];
+                    setProgress(((i + 1) / total) * 100);
+
+                    // Нормализуем данные
+                    const dishData = {
+                        category_id: dish.categoryId || dish.category_id,
+                        name: dish.name,
+                        recipe: dish.recipe || 'Рецепт пока не добавлен',
+                        image: dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
+                        hidden: dish.hidden || false,
+                        in_today: dish.inToday !== undefined ? dish.inToday : (dish.in_today || false)
+                    };
+
+                    // Проверяем, существует ли блюдо с таким ID
+                    const existing = existingDishes.find(d => d.id === dish.id);
+                    
+                    try {
+                        if (existing) {
+                            // Обновляем
+                            const response = await fetch(`${API_URL}?id=eq.${dish.id}`, {
+                                method: 'PATCH',
+                                headers: HEADERS,
+                                body: JSON.stringify(dishData)
+                            });
+                            if (response.ok) {
+                                updated++;
+                                log(`✏️ Обновлено: ${dish.name}`, 'success');
+                            } else {
+                                errors++;
+                                log(`❌ Ошибка обновления: ${dish.name}`, 'error');
+                            }
+                        } else {
+                            // Добавляем
+                            const response = await fetch(API_URL, {
+                                method: 'POST',
+                                headers: { ...HEADERS, 'Prefer': 'return=representation' },
+                                body: JSON.stringify(dishData)
+                            });
+                            if (response.ok) {
+                                added++;
+                                log(`✅ Добавлено: ${dish.name}`, 'success');
+                            } else {
+                                errors++;
+                                log(`❌ Ошибка добавления: ${dish.name}`, 'error');
+                            }
+                        }
+                    } catch (err) {
+                        errors++;
+                        log(`❌ Ошибка: ${dish.name} — ${err.message}`, 'error');
+                    }
+
+                    // Небольшая задержка между запросами
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                el.textContent = `✅ ${added} добавлено, ${updated} обновлено`;
+                el.className = 'status-value success';
+
+                return { added, updated, errors, total };
+            } catch (error) {
+                el.textContent = `❌ ${error.message}`;
+                el.className = 'status-value error';
+                log(`Ошибка подключения: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Инициализация
+        async function init() {
+            await checkIndexedDB();
+
+            const hasIndexedDB = dishesFromIndexedDB.length > 0;
+            const migrateBtn = document.getElementById('startMigration');
+            
+            if (hasIndexedDB) {
+                migrateBtn.textContent = `🚀 Миграция: ${dishesFromIndexedDB.length} рецептов из браузера`;
+                migrateBtn.disabled = false;
+            } else {
+                migrateBtn.textContent = '🚀 Нет данных в браузере — загрузи файл экспорта';
+                migrateBtn.disabled = true;
+            }
+        }
+
+        // Обработчик миграции
+        document.getElementById('startMigration').addEventListener('click', async () => {
+            const btn = document.getElementById('startMigration');
+            btn.disabled = true;
+            btn.textContent = '⏳ Миграция...';
+
+            try {
+                const result = await migrateToSupabase(dishesFromIndexedDB);
+                
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+                document.getElementById('migrateResult').innerHTML = 
+                    `Перенесено <strong>${result.total}</strong> рецептов в Supabase!<br>` +
+                    `Добавлено: ${result.added}, Обновлено: ${result.updated}${result.errors > 0 ? `, Ошибок: ${result.errors}` : ''}`;
+            } catch (error) {
+                btn.disabled = false;
+                btn.textContent = '❌ Ошибка — попробуй снова';
+                setTimeout(() => {
+                    btn.textContent = `🚀 Миграция: ${dishesFromIndexedDB.length} рецептов из браузера`;
+                }, 3000);
+            }
+        });
+
+        // Обработчик выбора файла
+        document.getElementById('chooseFile').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+
+        document.getElementById('importFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const count = await importFromFile(file);
+            
+            if (count > 0) {
+                const migrateBtn = document.getElementById('startMigration');
+                migrateBtn.textContent = `🚀 Миграция: ${count} рецептов из файла`;
+                migrateBtn.disabled = false;
+
+                // Переключаем источник
+                dishesFromIndexedDB = dishesFromFile;
+
+                migrateBtn.onclick = async () => {
+                    migrateBtn.disabled = true;
+                    migrateBtn.textContent = '⏳ Миграция...';
+
+                    try {
+                        const result = await migrateToSupabase(dishesFromFile);
+                        
+                        document.getElementById('step1').classList.add('hidden');
+                        document.getElementById('step2').classList.remove('hidden');
+                        document.getElementById('migrateResult').innerHTML = 
+                            `Перенесено <strong>${result.total}</strong> рецептов из файла в Supabase!<br>` +
+                            `Добавлено: ${result.added}, Обновлено: ${result.updated}${result.errors > 0 ? `, Ошибок: ${result.errors}` : ''}`;
+                    } catch (error) {
+                        migrateBtn.disabled = false;
+                        migrateBtn.textContent = '❌ Ошибка — попробуй снова';
+                    }
+                };
+
+                log(`Файл загружен: ${count} рецептов`, 'success');
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>

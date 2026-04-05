@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Домашнее меню 💜</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Кнопка "Наверх" -->
+    <button class="scroll-to-top" id="scrollToTop" title="Наверх">↑</button>
+
+    <!-- Раздел "Сегодня на ужин" -->
+    <section class="today-section" id="todaySection">
+        <div class="section-header">
+            <h2>🍽️ Сегодня на ужин</h2>
+            <button class="clear-btn" id="clearToday" title="Очистить выбор">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+                Очистить
+            </button>
+        </div>
+        <div class="dishes-grid" id="todayGrid"></div>
+    </section>
+
+    <!-- Поиск -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="Поиск блюд...">
+        <button class="search-clear" id="searchClear" title="Очистить поиск">×</button>
+    </div>
+
+    <!-- Основные разделы меню -->
+    <main class="menu-container" id="menuContainer">
+        <!-- Секции будут сгенерированы JavaScript -->
+    </main>
+
+    <!-- Управление данными -->
+    <div class="data-controls-container">
+        <div class="data-controls">
+            <button class="data-btn" id="exportBtn" title="Экспорт рецептов">
+                📤 Экспорт
+            </button>
+            <button class="data-btn" id="importBtn" title="Импорт рецептов">
+                📥 Импорт
+            </button>
+            <input type="file" id="importInput" accept=".json" style="display: none;">
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования/просмотра блюда -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="dishModal">
+            <button class="modal-close" id="modalClose">×</button>
+            <div class="modal-content">
+                <div class="modal-image-container" id="modalImageContainer">
+                    <img src="" alt="" class="modal-image" id="modalImage">
+                    <button class="modal-image-edit" id="modalImageEdit" title="Загрузить фото">📷</button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <div class="image-drop-hint" id="imageDropHint">Перетащи фото или нажми Ctrl+V</div>
+                </div>
+                <input type="text" class="modal-title" id="modalTitle" placeholder="Название блюда">
+                <textarea class="modal-recipe" id="modalRecipe" placeholder="Рецепт приготовления..."></textarea>
+                <div class="modal-actions">
+                    <button class="btn-save" id="modalSave">Сохранить</button>
+                    <button class="btn-cancel" id="modalCancel">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления нового блюда -->
+    <div class="modal-overlay" id="addModalOverlay">
+        <div class="modal" id="addModal">
+            <button class="modal-close" id="addModalClose">×</button>
+            <div class="modal-content">
+                <h3>Добавить новое блюдо</h3>
+                <input type="text" class="modal-title" id="addDishName" placeholder="Название блюда">
+                <div class="add-image-container" id="addImageContainer">
+                    <div class="add-image-preview" id="addImagePreview">
+                        <span>📷 Нажми для загрузки фото</span>
+                    </div>
+                    <div class="image-drop-hint" id="addDropHint">Перетащи фото или нажми Ctrl+V</div>
+                    <input type="file" id="addImageInput" accept="image/*" style="display: none;">
+                </div>
+                <textarea class="modal-recipe" id="addDishRecipe" placeholder="Рецепт приготовления..."></textarea>
+                <div class="modal-actions">
+                    <button class="btn-save" id="addDishSave">Добавить</button>
+                    <button class="btn-cancel" id="addDishCancel">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,736 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-purple: #7c3aed;
+    --primary-purple-dark: #5b21b6;
+    --primary-purple-light: #9f67ff;
+    --burgundy: #800020;
+    --burgundy-light: #a31545;
+    --black: #1a1a1a;
+    --black-light: #2d2d2d;
+    --white: #ffffff;
+    --gray-light: #f5f5f5;
+    --gray: #9ca3af;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('hero-img-9-2.png') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    color: var(--white);
+    line-height: 1.6;
+}
+
+/* Кнопка "Наверх" */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-purple), #61025e);
+    border: 2px solid var(--primary-purple-light);
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 20px -3px rgba(124, 58, 237, 0.5);
+}
+
+/* Раздел "Сегодня на ужин" */
+.today-section {
+    background: rgba(26, 26, 26, 0.9);
+    border-bottom: 2px solid #61025e;
+    padding: 20px 40px;
+    backdrop-filter: blur(10px);
+}
+
+.today-section.hidden {
+    display: none;
+}
+
+.today-section .dishes-grid {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-size: 1.8rem;
+    color: var(--primary-purple-light);
+    text-shadow: 0 0 10px rgba(159, 103, 255, 0.5);
+}
+
+.clear-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #61025e, var(--primary-purple));
+    border: none;
+    border-radius: 25px;
+    color: var(--white);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(97, 2, 94, 0.5);
+}
+
+/* Поиск */
+.search-container {
+    position: relative;
+    padding: 20px 0;
+    background: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(10px);
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 15px 50px 15px 25px;
+    border: 2px solid #61025e;
+    border-radius: 30px;
+    background: var(--black-light);
+    color: var(--white);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary-purple-light);
+    box-shadow: 0 0 20px rgba(163, 21, 69, 0.3);
+}
+
+.search-input::placeholder {
+    color: var(--gray);
+}
+
+.search-clear {
+    position: absolute;
+    right: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 35px;
+    border: none;
+    background: #61025e;
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.search-clear.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.search-clear:hover {
+    background: var(--primary-purple);
+    transform: translateY(-50%) rotate(90deg);
+}
+
+/* Контейнер меню */
+.menu-container {
+    padding: 20px 40px 60px;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Секция категории */
+.category-section {
+    margin-bottom: 50px;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    color: var(--white);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Сетка блюд */
+.dishes-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+
+/* Карточка блюда */
+.dish-card {
+    background: linear-gradient(145deg, var(--black-light), var(--black));
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.dish-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: #61025e;
+}
+
+.dish-card.hidden {
+    opacity: 0.5;
+}
+
+.dish-card.hidden .dish-card-actions {
+    pointer-events: none;
+}
+
+.dish-card.hidden .visibility-btn {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.dish-card.hidden::after {
+    content: 'Пока недоступно :(';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    color: var(--primary-purple-light);
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.dish-card-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.dish-card-content {
+    padding: 15px;
+}
+
+.dish-card-title {
+    font-size: 1rem;
+    color: var(--white);
+    margin-bottom: 10px;
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dish-card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.dish-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.want-btn {
+    background: linear-gradient(135deg, var(--primary-purple), #61025e);
+    color: var(--white);
+}
+
+.want-btn:hover {
+    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.5);
+    transform: scale(1.05);
+}
+
+.want-btn.active {
+    background: linear-gradient(135deg, #61025e, var(--primary-purple));
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(124, 58, 237, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(159, 103, 255, 0.8); }
+}
+
+.visibility-btn {
+    background: var(--black-light);
+    color: var(--gray);
+    border: 1px solid var(--gray);
+}
+
+.visibility-btn:hover {
+    background: var(--primary-purple);
+    color: var(--white);
+    border-color: var(--primary-purple);
+}
+
+.delete-btn {
+    background: var(--black-light);
+    color: #61025e;
+    border: 1px solid #61025e;
+}
+
+.delete-btn:hover {
+    background: #61025e;
+    color: var(--white);
+}
+
+/* Слот для добавления нового блюда */
+.add-dish-slot {
+    background: transparent;
+    border: 2px dashed #61025e;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.add-dish-slot:hover {
+    background: rgba(124, 58, 237, 0.1);
+    border-color: var(--white);
+}
+
+.add-dish-slot::before {
+    content: '+';
+    font-size: 4rem;
+    color: #61025e;
+    transition: all 0.3s ease;
+}
+
+.add-dish-slot:hover::before {
+    color: var(--white);
+    transform: scale(1.2);
+}
+
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: linear-gradient(145deg, var(--black-light), var(--black));
+    border: 2px solid #61025e;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.visible .modal {
+    transform: scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    border: none;
+    background: #61025e;
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: var(--primary-purple);
+    transform: rotate(90deg);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-content h3 {
+    color: #61025e;
+    text-align: center;
+}
+
+.modal-image-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    border-radius: 15px;
+    overflow: hidden;
+    background: var(--black);
+}
+
+.modal-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-image-edit {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 10px;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-image-edit:hover {
+    background: #61025e;
+}
+
+/* Подсказка для drag & drop и paste */
+.image-drop-hint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(97, 2, 94, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.image-drop-hint.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Стили для зоны drag & drop в модальном окне добавления */
+.add-image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border-radius: 15px;
+    overflow: hidden;
+    background: var(--black);
+    border: 2px dashed #61025e;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-image-container:hover {
+    border-color: var(--primary-purple-light);
+    background: rgba(163, 21, 69, 0.1);
+}
+
+.add-image-container.drag-over {
+    border-color: var(--primary-purple-light);
+    background: rgba(159, 103, 255, 0.2);
+    transform: scale(1.02);
+}
+
+.add-image-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.add-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-title {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #61025e;
+    border-radius: 10px;
+    background: var(--black);
+    color: var(--white);
+    font-size: 1.2rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.modal-title:focus {
+    border-color: var(--primary-purple-light);
+    box-shadow: 0 0 15px rgba(159, 103, 255, 0.3);
+}
+
+.modal-recipe {
+    width: 100%;
+    min-height: 200px;
+    padding: 15px;
+    border: 2px solid #61025e;
+    border-radius: 10px;
+    background: var(--black);
+    color: var(--white);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.modal-recipe:focus {
+    border-color: var(--primary-purple-light);
+    box-shadow: 0 0 15px rgba(159, 103, 255, 0.3);
+}
+
+.modal-recipe::placeholder {
+    color: var(--gray);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-save {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, var(--primary-purple), #61025e);
+    border: none;
+    border-radius: 25px;
+    color: var(--white);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(124, 58, 237, 0.5);
+}
+
+.btn-cancel {
+    padding: 12px 30px;
+    background: var(--black-light);
+    border: 2px solid #61025e;
+    border-radius: 25px;
+    color: var(--white);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    border-color: var(--primary-purple);
+    color: var(--primary-purple-light);
+}
+
+/* Адаптивность */
+@media (max-width: 1400px) {
+    .dishes-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 1100px) {
+    .dishes-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .dishes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .today-section,
+    .search-container,
+    .menu-container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .dishes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Скроллбар */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-purple), #61025e);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-purple-light);
+}
+
+/* Уведомление */
+.notification {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, var(--primary-purple), #61025e);
+    color: var(--white);
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 3000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Скроллбар для раздела "Сегодня" */
+#todayGrid::-webkit-scrollbar {
+    width: 8px;
+}
+
+#todayGrid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+#todayGrid::-webkit-scrollbar-thumb {
+    background: var(--primary-purple);
+    border-radius: 4px;
+}
+
+#todayGrid::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-purple-light);
+}
+
+/* Курсор при перетаскивании */
+.dish-card[draggable="true"] {
+    cursor: grab;
+}
+
+.dish-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Кнопки управления данными */
+.data-controls-container {
+    padding: 30px 40px 60px;
+    text-align: center;
+}
+
+.data-controls {
+    display: inline-flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.data-btn {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, var(--primary-purple), #61025e);
+    border: none;
+    border-radius: 25px;
+    color: var(--white);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.data-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
