@@ -2,7 +2,7 @@
 // КОНФИГУРАЦИЯ SUPABASE
 // =============================================
 const SUPABASE_URL = 'https://htuzloqefvljfjlapacc.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_wi33_gPix08GxEfnRBtUtg_yvTGx4Ye';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dXpsb3FlZnZsamZqbGFwYWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MTE4NTEsImV4cCI6MjA5MDk4Nzg1MX0.NdPj6HMtueCKGlC3hVePSNCkmK2hZDytNVjNEGnOwg8';
 // =============================================
 
 const API_URL = `${SUPABASE_URL}/rest/v1/dishes`;
