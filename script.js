@@ -95,17 +95,17 @@ async function loadFromSupabase() {
 // Сохранение всех изменений в Supabase
 async function saveToSupabase() {
     try {
-        // Получаем все блюда и обновляем каждое
-        const response = await fetch(`${API_URL}?order=id.asc`, {
-            headers: HEADERS
-        });
-        const existingDishes = await response.json();
+        console.log('💾 Сохранение всех изменений...');
         
         // Обновляем или добавляем каждое блюдо
         for (const dish of dishes) {
-            const existing = existingDishes.find(d => d.id === dish.id);
-            
-            if (existing) {
+            // Сначала проверяем, существует ли блюдо с таким id
+            const checkResponse = await fetch(`${API_URL}?id=eq.${dish.id}&select=id`, {
+                headers: HEADERS
+            });
+            const existing = await checkResponse.json();
+
+            if (existing && existing.length > 0) {
                 // Обновляем существующее
                 await fetch(`${API_URL}?id=eq.${dish.id}`, {
                     method: 'PATCH',
@@ -119,9 +119,10 @@ async function saveToSupabase() {
                         in_today: dish.inToday
                     })
                 });
+                console.log(`  ✏️ Обновлено: ${dish.name} (id=${dish.id})`);
             } else {
                 // Добавляем новое
-                await fetch(API_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         ...HEADERS,
@@ -136,10 +137,15 @@ async function saveToSupabase() {
                         in_today: dish.inToday
                     })
                 });
+                const result = await response.json();
+                if (result && result.length > 0) {
+                    dish.id = result[0].id; // Обновляем id из Supabase
+                }
+                console.log(`  ➕ Добавлено: ${dish.name}`);
             }
         }
     } catch (error) {
-        console.error('Ошибка сохранения в Supabase:', error);
+        console.error('❌ Ошибка сохранения в Supabase:', error);
         alert('⚠️ Ошибка сохранения. Проверь подключение к базе данных.');
     }
 }
